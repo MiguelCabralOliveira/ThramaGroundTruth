@@ -1,0 +1,23 @@
+# Project: GroundTruth - Real Estate Agentic RAG Backend
+
+# Tech Stack
+- Language: Python 3.11+
+- Orchestration: LangGraph (StateGraph)
+- LLMs: LangChain (ChatOpenAI, ChatAnthropic)
+- Database: Pinecone (Vector), Postgres (Optional for logs)
+- Tools: Tavily API, Exa.ai, LlamaParse, E2B Code Interpreter
+- Output: Typst (PDF generation)
+
+# Coding Style
+- Use Type Hints for all functions (TypedDict for State).
+- Don't use # comments. Use '''docstrings'''
+- Follow PEP 8 standards.
+- Use `python-dotenv` for environment variables.
+- Modular Architecture: Separate logic (.py) from prompts (.md).
+- Error Handling: All tools must have try/except blocks to prevent graph crashes.
+
+# Architecture Rules
+1. DO NOT put long prompts in Python files. Load them from `src/prompts/`.
+2. Every Agent must accept `AgentGraphState` and return a dictionary update.
+3. Use Pydantic models for Structured Output (JSON schemas).
+4. Do not use UI libraries (Streamlit) yet. Backend logic only.

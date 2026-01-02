@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Intelligence Report</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+
+            @bottom-center {
+                content: "Page " counter(page);
+                font-family: 'Helvetica', sans-serif;
+                font-size: 9pt;
+                color: #666;
+            }
+        }
+
+        @page cover {
+            margin: 0;
+
+            @bottom-center {
+                content: none;
+            }
+        }
+
+        @page prompt-page {
+            margin: 2.5cm;
+
+            @bottom-center {
+                content: none;
+            }
+        }
+
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            line-height: 1.7;
+            color: #2c3e50;
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+        }
+
+        /* Color Palette */
+        :root {
+            --primary-orange: #FFB984;
+            --accent-orange: #e67e22;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --bg-light: #f9f9f9;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            color: var(--text-dark);
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 22pt;
+            border-bottom: 3px solid var(--primary-orange);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        h2 {
+            font-size: 16pt;
+            color: var(--accent-orange);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        h3 {
+            font-size: 13pt;
+            color: var(--text-light);
+        }
+
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+
+        ul,
+        ol {
+            margin-bottom: 1em;
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 0.6em;
+        }
+
+        /* Cover Page */
+        .cover-page {
+            page: cover;
+            width: 210mm;
+            height: 297mm;
+            position: relative;
+            overflow: hidden;
+            page-break-after: always;
+        }
+
+        .cover-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 210mm;
+            height: 297mm;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        .cover-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.5));
+            z-index: 1;
+        }
+
+        .cover-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 25mm;
+            box-sizing: border-box;
+        }
+
+        .cover-header {
+            text-align: left;
+        }
+
+        .logo {
+            width: 100px;
+            filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .cover-footer {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slogan-img {
+            height: 30px;
+            filter: brightness(0) invert(1);
+        }
+
+        /* Prompt Page */
+        .prompt-page {
+            page: prompt-page;
+            page-break-after: always;
+            min-height: 200mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .prompt-container {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border-left: 6px solid var(--primary-orange);
+            padding: 40px 50px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .prompt-label {
+            font-size: 11pt;
+            font-weight: bold;
+            color: var(--accent-orange);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+        }
+
+        .prompt-text {
+            font-size: 20pt;
+            font-weight: 300;
+            color: var(--text-dark);
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        /* Section Styling */
+        .section {
+            margin-bottom: 2em;
+            page-break-inside: avoid;
+        }
+
+        .section-exec {
+            page-break-after: always;
+        }
+
+        /* Key Takeaways Styling */
+        .takeaways-container {
+            background-color: #fef9f3;
+            border: 1px solid var(--primary-orange);
+            border-radius: 8px;
+            padding: 25px 30px;
+            margin-top: 15px;
+        }
+
+        .takeaways-container ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .takeaways-container li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .takeaways-container li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--accent-orange);
+            font-weight: bold;
+        }
+
+        /* Investment Thesis Styling */
+        .thesis-container {
+            background: linear-gradient(to right, var(--primary-orange), #ffd9b3);
+            padding: 30px 35px;
+            border-radius: 8px;
+            margin-top: 15px;
+            color: var(--text-dark);
+        }
+
+        .thesis-container p {
+            font-size: 12pt;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        /* Scorecard Table */
+        .scorecard-container table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 10pt;
+        }
+
+        .scorecard-container th {
+            background-color: var(--primary-orange);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .scorecard-container td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+
+        .scorecard-container tr:nth-child(even) {
+            background-color: #fef9f3;
+        }
+
+        /* Charts */
+        .chart-container {
+            text-align: center;
+            margin: 2em 0;
+            page-break-inside: avoid;
+        }
+
+        .chart-img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #eee;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Content Markdown Styling */
+        .content ul {
+            list-style-type: disc;
+        }
+
+        .content a {
+            color: var(--accent-orange);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <img src="assets/Generated Image December 31, 2025 - 12_52PM.jpeg" class="cover-bg" alt="Background">
+        <div class="cover-overlay"></div>
+
+        <div class="cover-content">
+            <div class="cover-header">
+                <img src="assets/logo.svg" class="logo" alt="Logo">
+            </div>
+
+            <div class="cover-footer">
+                <img src="assets/plant your wealth..svg" class="slogan-img" alt="Plant Your Wealth">
+                <img src="assets/Where investments grow.svg" class="slogan-img" alt="Where Investments Grow">
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 2: User Prompt -->
+    <div class="prompt-page">
+        <div class="prompt-container">
+            <div class="prompt-label">Research Objective</div>
+            <div class="prompt-text">"{{ user_request }}"</div>
+        </div>
+    </div>
+
+    <!-- Page 3: Executive Summary -->
+    <div class="section section-exec">
+        <h1>Executive Summary</h1>
+        <div class="content">
+            {{ report.executive_summary | markdown | safe }}
+        </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="section">
+        <h1>Key Takeaways</h1>
+        <div class="takeaways-container">
+            {{ report.key_takeaways | markdown | safe }}
+        </div>
+    </div>
+
+    <!-- Investment Thesis -->
+    <div class="section">
+        <h1>Investment Thesis</h1>
+        <div class="thesis-container">
+            {{ report.investment_thesis | markdown | safe }}
+        </div>
+    </div>
+
+    <!-- Go/No-Go Scorecard -->
+    <div class="section">
+        <h1>Go / No-Go Scorecard</h1>
+        <div class="scorecard-container">
+            {{ report.go_no_go_scorecard | markdown | safe }}
+        </div>
+    </div>
+
+    <!-- Macro & Market Context -->
+    <div class="section">
+        <h1>Macro & Market Context</h1>
+        <div class="content">
+            {{ report.macro_market_context | markdown | safe }}
+        </div>
+    </div>
+
+    <!-- Market Overview -->
+    <div class="section">
+        <h1>Market Overview</h1>
+        <div class="content">
+            {{ report.market_overview | markdown | safe }}
+        </div>
+    </div>
+
+    <!-- Data Analysis -->
+    <div class="section">
+        <h1>Data Analysis</h1>
+        <div class="content">
+            {{ report.data_analysis | markdown | safe }}
+        </div>
+
+        {% if charts %}
+        <div class="chart-container">
+            <h3>Key Metrics Visualization</h3>
+            {% for chart in charts %}
+            <img src="{{ chart }}" class="chart-img" alt="Market Chart">
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Risk Assessment -->
+    <div class="section">
+        <h1>Risk Assessment</h1>
+        <div class="content">
+            {{ report.risk_assessment | markdown | safe }}
+        </div>
+    </div>
+
+    <!-- Conclusion -->
+    <div class="section">
+        <h1>Conclusion</h1>
+        <div class="content">
+            {{ report.conclusion | markdown | safe }}
+        </div>
+    </div>
+
+</body>
+
+</html>
