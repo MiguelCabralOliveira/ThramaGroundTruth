@@ -8,8 +8,10 @@ class AgentGraphState(TypedDict):
     """State structure for the GroundTruth agent graph."""
     
     user_request: str
+    enhanced_request: Optional[str]
     research_plan: Optional[ResearchPlan]
     pdf_documents: List[str]  # Parsed text content from PDFs
+    pdf_urls: List[str]  # Original URLs of the PDFs
     source_documents: List[dict]  # RAG chunks with metadata: {text, source_url, source_title}
     analyst_output: Optional[AnalystOutput]
     qualitative_research: str

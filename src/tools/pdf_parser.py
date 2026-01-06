@@ -1,58 +1,50 @@
-"""PDF parsing tool using LlamaParse API."""
+"""PDF parsing tool using PyMuPDF (fitz)."""
 
+import requests
+import fitz  # PyMuPDF
 from typing import List
-from llama_parse import LlamaParse
-from src.config import Config
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 
 class PDFIngest:
-    """Wrapper for LlamaParse to extract text from PDF URLs."""
+    """Wrapper for PyMuPDF to extract text from PDF URLs."""
     
     def __init__(self):
-        """Initialize LlamaParse client with API key."""
-        self.parser = None
-        if Config.LLAMA_CLOUD_API_KEY:
-            try:
-                self.parser = LlamaParse(
-                    api_key=Config.LLAMA_CLOUD_API_KEY,
-                    result_type="markdown"
-                )
-            except Exception as e:
-                logger.warning(f"Failed to initialize LlamaParse: {e}")
-        else:
-            logger.warning("LLAMA_CLOUD_API_KEY not found in environment")
+        """Initialize PDFIngest."""
+        # No API key needed for PyMuPDF
+        pass
     
     def parse_urls(self, urls: List[str]) -> List[str]:
         """
-        Parse PDFs from URLs and extract markdown text.
+        Parse PDFs from URLs and extract text using PyMuPDF.
         
         Args:
             urls: List of PDF URLs to parse
             
         Returns:
-            List of markdown text strings (one per PDF)
+            List of text strings (one per PDF)
         """
-        if not self.parser:
-            logger.error("LlamaParse not initialized")
-            return []
-        
         parsed_documents = []
         
         for url in urls:
             try:
-                logger.info(f"Parsing PDF from URL: {url}")
-                documents = self.parser.load_data(url)
+                logger.info(f"Downloading PDF from URL: {url}")
+                response = requests.get(url, timeout=30)
+                response.raise_for_status()
                 
-                # Combine all pages into a single markdown string
-                full_text = "\n\n".join([doc.text for doc in documents if hasattr(doc, 'text')])
-                if full_text:
-                    parsed_documents.append(full_text)
-                    logger.info(f"Successfully parsed PDF: {len(full_text)} characters")
-                else:
-                    logger.warning(f"No text extracted from URL: {url}")
+                # Open PDF from bytes
+                with fitz.open(stream=response.content, filetype="pdf") as doc:
+                    text = ""
+                    for page in doc:
+                        text += page.get_text() + "\n\n"
+                    
+                    if text.strip():
+                        parsed_documents.append(text)
+                        logger.info(f"Successfully parsed PDF: {len(text)} characters")
+                    else:
+                        logger.warning(f"No text extracted from URL: {url}")
                     
             except Exception as e:
                 logger.error(f"Error parsing PDF from '{url}': {e}")

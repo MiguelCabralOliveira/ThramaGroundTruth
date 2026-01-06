@@ -7,15 +7,26 @@ from src.state import AgentGraphState
 from src.schemas import ReviewCritique
 from src.config import Config
 from src.utils.logger import get_logger
+from src.utils.toon_serializer import pydantic_to_toon
 
 logger = get_logger(__name__)
 
 
 def load_prompt() -> str:
-    """Load the auditor prompt from markdown file."""
-    prompt_path = Path(__file__).parent.parent / "prompts" / "06_auditor.md"
+    """Load the auditor prompt and global instructions."""
+    base_path = Path(__file__).parent.parent / "prompts"
+    
+    # Load global instructions
+    global_path = base_path / "global_instructions.md"
+    global_instr = ""
+    if global_path.exists():
+        with open(global_path, "r", encoding="utf-8") as f:
+            global_instr = f.read() + "\n\n"
+            
+    # Load auditor prompt
+    prompt_path = base_path / "06_auditor.md"
     with open(prompt_path, "r", encoding="utf-8") as f:
-        return f.read()
+        return global_instr + f.read()
 
 
 def agent_node(state: AgentGraphState) -> dict:
@@ -52,7 +63,7 @@ def agent_node(state: AgentGraphState) -> dict:
         
         # Initialize LLM with structured output
         llm = ChatOpenAI(
-            model=Config.OPENAI_MODEL,
+            model=Config.AGENT_MODELS["auditor"],
             temperature=0.2,
             api_key=Config.OPENAI_API_KEY
         )
@@ -60,10 +71,10 @@ def agent_node(state: AgentGraphState) -> dict:
         # Use with_structured_output instead of PydanticOutputParser to avoid template variable conflicts
         structured_llm = llm.with_structured_output(ReviewCritique, method="function_calling")
         
-        # Prepare inputs
-        research_plan_str = research_plan.model_dump_json(indent=2) if research_plan else "N/A"
-        report_draft_str = report_draft.model_dump_json(indent=2) if report_draft else "N/A"
-        analyst_output_str = analyst_output.model_dump_json(indent=2) if analyst_output else "N/A"
+        # Prepare inputs (using TOON for token efficiency)
+        research_plan_str = pydantic_to_toon(research_plan) if research_plan else "N/A"
+        report_draft_str = pydantic_to_toon(report_draft) if report_draft else "N/A"
+        analyst_output_str = pydantic_to_toon(analyst_output) if analyst_output else "N/A"
         
         # Truncate PDF documents for reference (don't send full content)
         pdf_summary = f"{len(pdf_documents)} documents available for reference"

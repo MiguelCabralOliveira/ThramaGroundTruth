@@ -17,7 +17,8 @@ class ResearchPlan(BaseModel):
 class AnalystOutput(BaseModel):
     """Quantitative analysis output from the Analyst agent."""
     
-    key_metrics: Dict[str, Any] = Field(..., description="Key quantitative metrics extracted")
+    key_metrics: Dict[str, Any] = Field(default_factory=dict, description="Key quantitative metrics extracted")
+    chart_data: List[Dict[str, Any]] = Field(default_factory=list, description="List of chart specifications")
     charts_generated: List[str] = Field(default_factory=list, description="Paths to generated chart images")
 
 
@@ -26,13 +27,17 @@ class ReportDraft(BaseModel):
     
     executive_summary: str = Field(..., description="Executive summary section")
     key_takeaways: str = Field(..., description="Key takeaways bullet points")
-    investment_thesis: str = Field(..., description="Investment thesis section")
-    go_no_go_scorecard: str = Field(..., description="Go/No-Go scorecard table")
+    market_assessment: str = Field(..., description="Neutral market assessment with summary table")
+    case_studies: str = Field(..., description="Table of recent transactions and case studies")
     macro_market_context: str = Field(..., description="Macro and market context section")
     market_overview: str = Field(..., description="Market overview section")
     data_analysis: str = Field(..., description="Data analysis section")
     risk_assessment: str = Field(..., description="Risk assessment section")
     conclusion: str = Field(..., description="Conclusion section")
+    competitive_landscape: str = Field(..., description="Competitive landscape analysis")
+    regulatory_policy_environment: str = Field(..., description="Regulatory and policy environment section")
+    pricing_valuation_analysis: str = Field(..., description="Pricing and valuation analysis section")
+    operational_considerations: str = Field(..., description="Operational considerations section")
 
 
 class ReviewCritique(BaseModel):

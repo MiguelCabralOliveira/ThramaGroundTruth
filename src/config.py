@@ -13,7 +13,20 @@ class Config:
 
     # OpenAI
     OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY")
-    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-5-mini-2025-08-07")
+    # gpt-5.2-2025-12-11
+    OPENAI_MODEL_PRO: str = os.getenv("OPENAI_MODEL_PRO", "gpt-5-mini-2025-08-07")
+    
+    # Per-agent model configuration
+    AGENT_MODELS = {
+        "prompt_enhancer": OPENAI_MODEL,
+        "strategist": OPENAI_MODEL,
+        "scout": OPENAI_MODEL,
+        "researcher": OPENAI_MODEL,
+        "analyst": OPENAI_MODEL_PRO,
+        "writer": OPENAI_MODEL_PRO,
+        "auditor": OPENAI_MODEL,
+    }
     
     # Anthropic
     ANTHROPIC_API_KEY: Optional[str] = os.getenv("ANTHROPIC_API_KEY")

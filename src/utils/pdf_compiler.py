@@ -29,7 +29,7 @@ class PDFCompiler:
         # Add markdown filter with tables extension
         self.env.filters['markdown'] = lambda text: markdown.markdown(
             text, 
-            extensions=['tables', 'fenced_code']
+            extensions=['tables', 'fenced_code', 'extra']
         ) if text else ""
         
         logger.info("PDF compiler initialized with WeasyPrint support")

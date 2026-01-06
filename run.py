@@ -27,13 +27,13 @@ def format_report_draft(report_draft) -> str:
 
 {report_draft.key_takeaways}
 
-## Investment Thesis
+## Market Assessment
 
-{report_draft.investment_thesis}
+{report_draft.market_assessment}
 
-## Go/No-Go Scorecard
+## Case Studies
 
-{report_draft.go_no_go_scorecard}
+{report_draft.case_studies}
 
 ## Macro & Market Context
 
@@ -111,7 +111,7 @@ def main():
     graph = create_graph(checkpointer=checkpointer)
     
     # User request (hardcoded example as specified)
-    user_request = "Analyze the Uk multitenant light industry facilities markets for renting"
+    user_request = "Investment analysis of the UK Multi-Let Industrial (MLI) sector focusing on acquisition strategies and rental yield potential"
     
     logger.info(f"Processing request: {user_request}")
     logger.info("-" * 60)
@@ -119,6 +119,7 @@ def main():
     # Initialize state
     initial_state: AgentGraphState = {
         "user_request": user_request,
+        "enhanced_request": None,
         "research_plan": None,
         "pdf_documents": [],
         "source_documents": [],

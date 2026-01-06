@@ -55,7 +55,7 @@ def agent_node(state: AgentGraphState) -> dict:
         prompt_template = load_prompt()
         
         llm = ChatOpenAI(
-            model=Config.OPENAI_MODEL,
+            model=Config.AGENT_MODELS["scout"],
             temperature=0.2,
             api_key=Config.OPENAI_API_KEY
         )
@@ -68,7 +68,10 @@ def agent_node(state: AgentGraphState) -> dict:
 Search Results URLs:
 {urls}
 
-Please select the best URLs for analysis.""")
+Please select the best URLs for analysis.
+CRITICAL INSTRUCTION: Prioritize high-authority, institutional sources (e.g., major real estate consultancies, government bodies, financial institutions) and primary data. 
+Avoid aggregators, low-quality blogs, or generic listing sites.
+Select sources that are most likely to contain detailed market data and analysis.""")
         ])
         
         chain = prompt | llm
@@ -95,10 +98,10 @@ Please select the best URLs for analysis.""")
                 response_text = response_text[json_start:json_end].strip()
             
             selection_result = json.loads(response_text)
-            selected_urls = selection_result.get("selected_urls", all_urls[:5])  # Fallback to first 5
+            selected_urls = selection_result.get("selected_urls", all_urls[:20])  # Fallback to first 20
         except json.JSONDecodeError:
-            logger.warning("Could not parse URL selection, using first 5 URLs")
-            selected_urls = all_urls[:5]
+            logger.warning("Could not parse URL selection, using first 20 URLs")
+            selected_urls = all_urls[:20]
         
         logger.info(f"Selected {len(selected_urls)} URLs for parsing")
         
@@ -131,7 +134,8 @@ Please select the best URLs for analysis.""")
                 logger.warning("Failed to store documents in Pinecone")
         
         return {
-            "pdf_documents": pdf_documents
+            "pdf_documents": pdf_documents,
+            "pdf_urls": selected_urls[:len(pdf_documents)]
         }
         
     except Exception as e:

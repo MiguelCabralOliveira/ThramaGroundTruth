@@ -13,10 +13,20 @@ logger = get_logger(__name__)
 
 
 def load_prompt() -> str:
-    """Load the strategist prompt from markdown file."""
-    prompt_path = Path(__file__).parent.parent / "prompts" / "01_strategist.md"
+    """Load the strategist prompt and global instructions."""
+    base_path = Path(__file__).parent.parent / "prompts"
+    
+    # Load global instructions
+    global_path = base_path / "global_instructions.md"
+    global_instr = ""
+    if global_path.exists():
+        with open(global_path, "r", encoding="utf-8") as f:
+            global_instr = f.read() + "\n\n"
+            
+    # Load strategist prompt
+    prompt_path = base_path / "01_strategist.md"
     with open(prompt_path, "r", encoding="utf-8") as f:
-        return f.read()
+        return global_instr + f.read()
 
 
 def agent_node(state: AgentGraphState) -> dict:
@@ -37,7 +47,7 @@ def agent_node(state: AgentGraphState) -> dict:
         
         # Initialize LLM with structured output
         llm = ChatOpenAI(
-            model=Config.OPENAI_MODEL,
+            model=Config.AGENT_MODELS["strategist"],
             temperature=0.3,
             api_key=Config.OPENAI_API_KEY
         )
@@ -54,9 +64,18 @@ def agent_node(state: AgentGraphState) -> dict:
         # Create chain
         chain = prompt | structured_llm
         
+        # Get current date
+        from datetime import datetime
+        current_date = datetime.now().strftime("%Y-%m-%d")
+        
         # Invoke chain
-        logger.info(f"Processing user request: {state['user_request']}")
-        research_plan = chain.invoke({"user_request": state["user_request"]})
+        request_to_process = state.get("enhanced_request") or state.get("user_request")
+        log_preview = request_to_process[:100] + "..." if len(request_to_process) > 100 else request_to_process
+        logger.info(f"Processing request: {log_preview}")
+        research_plan = chain.invoke({
+            "user_request": request_to_process,
+            "current_date": current_date
+        })
         
         logger.info(f"Research plan generated: {research_plan.target_sector} in {research_plan.geography}")
         

@@ -10,6 +10,7 @@ from src.agents.researcher import agent_node as researcher_node
 from src.agents.analyst import agent_node as analyst_node
 from src.agents.writer import agent_node as writer_node
 from src.agents.auditor import agent_node as auditor_node
+from src.agents.prompt_enhancer import agent_node as prompt_enhancer_node
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -62,33 +63,36 @@ def create_graph(checkpointer: Optional[MemorySaver] = None) -> Any:
     workflow = StateGraph(AgentGraphState)
     
     # Add nodes
+    workflow.add_node("prompt_enhancer", prompt_enhancer_node)
     workflow.add_node("strategist", strategist_node)
     workflow.add_node("scout", scout_node)
     workflow.add_node("researcher", researcher_node)
     workflow.add_node("analyst", analyst_node)
     workflow.add_node("writer", writer_node)
-    workflow.add_node("auditor", auditor_node)
+    # workflow.add_node("auditor", auditor_node)
     
     # Set entry point
-    workflow.set_entry_point("strategist")
+    workflow.set_entry_point("prompt_enhancer")
     
     # Define edges
+    workflow.add_edge("prompt_enhancer", "strategist")
     workflow.add_edge("strategist", "scout")
     workflow.add_edge("scout", "researcher")
     workflow.add_edge("scout", "analyst")  # Parallel execution
     workflow.add_edge("researcher", "writer")
     workflow.add_edge("analyst", "writer")
-    workflow.add_edge("writer", "auditor")
+    workflow.add_edge("writer", END)
+    # workflow.add_edge("writer", "auditor")
     
     # Conditional edge after auditor
-    workflow.add_conditional_edges(
-        "auditor",
-        should_continue,
-        {
-            "writer": "writer",
-            "end": END
-        }
-    )
+    # workflow.add_conditional_edges(
+    #     "auditor",
+    #     should_continue,
+    #     {
+    #         "writer": "writer",
+    #         "end": END
+    #     }
+    # )
     
     # Compile graph with optional checkpointer
     # Checkpointer is required for LangGraph Studio

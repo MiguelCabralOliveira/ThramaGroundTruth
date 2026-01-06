@@ -6,15 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Market Intelligence Report</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
         @page {
             size: A4;
             margin: 2cm;
+            margin-bottom: 3cm;
+            /* More space for footer */
 
             @bottom-center {
-                content: "Page " counter(page);
-                font-family: 'Helvetica', sans-serif;
-                font-size: 9pt;
-                color: #666;
+                content: element(footer);
             }
         }
 
@@ -34,66 +35,156 @@
             }
         }
 
+        @page toc-page {
+            margin: 2.5cm;
+
+            @bottom-center {
+                content: element(footer);
+            }
+        }
+
         body {
-            font-family: 'Helvetica', 'Arial', sans-serif;
-            line-height: 1.7;
-            color: #2c3e50;
+            font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #34495e;
             margin: 0;
             padding: 0;
             background-color: #fff;
+            font-size: 10.5pt;
         }
 
-        /* Color Palette */
+        /* Premium Palette */
         :root {
-            --primary-orange: #FFB984;
-            --accent-orange: #e67e22;
-            --text-dark: #2c3e50;
-            --text-light: #7f8c8d;
-            --bg-light: #f9f9f9;
+            --primary: #2c3e50;
+            /* Dark Blue/Grey */
+            --accent: #e67e22;
+            /* Orange */
+            --secondary: #ecf0f1;
+            /* Light Grey */
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
+            --border-color: #e0e0e0;
         }
 
+        /* Typography */
         h1,
         h2,
         h3,
         h4 {
-            color: var(--text-dark);
+            color: var(--primary);
             margin-top: 1.5em;
             margin-bottom: 0.5em;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         h1 {
-            font-size: 22pt;
-            border-bottom: 3px solid var(--primary-orange);
-            padding-bottom: 10px;
+            font-size: 30pt;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 12px;
             margin-top: 0;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
         }
 
         h2 {
             font-size: 16pt;
-            color: var(--accent-orange);
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
+            color: var(--accent);
+            border-bottom: 1px solid var(--secondary);
+            padding-bottom: 8px;
+            margin-top: 2em;
         }
 
         h3 {
             font-size: 13pt;
-            color: var(--text-light);
+            color: var(--text-main);
+            font-weight: 600;
         }
 
         p {
-            margin-bottom: 1em;
+            margin-bottom: 1.2em;
             text-align: justify;
+            font-size: 10.5pt;
         }
 
         ul,
         ol {
-            margin-bottom: 1em;
-            padding-left: 25px;
+            margin-bottom: 1.2em;
+            padding-left: 20px;
         }
 
         li {
-            margin-bottom: 0.6em;
+            margin-bottom: 0.5em;
+            color: var(--text-main);
+            font-size: 10.5pt;
+        }
+
+        /* Ensure consistent font sizes for all markdown-generated content */
+        .content {
+            font-size: 10.5pt;
+        }
+
+        .content * {
+            font-size: inherit;
+        }
+
+        .content p,
+        .content li,
+        .content span,
+        .content div {
+            font-size: 10.5pt !important;
+        }
+
+        .content strong,
+        .content b {
+            font-size: 10.5pt !important;
+            font-weight: 600;
+        }
+
+        .content em,
+        .content i {
+            font-size: 10.5pt !important;
+            font-style: italic;
+        }
+
+        .content code {
+            font-size: 9.5pt !important;
+            background: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .content pre {
+            font-size: 9.5pt !important;
+        }
+
+        .content blockquote {
+            font-size: 10.5pt !important;
+            border-left: 3px solid var(--accent);
+            padding-left: 15px;
+            margin-left: 0;
+            color: var(--text-muted);
+        }
+
+        .content table {
+            font-size: 10.5pt !important;
+        }
+
+        .content table td,
+        .content table th {
+            font-size: 10.5pt !important;
+        }
+
+        /* Override any nested markdown elements */
+        .content ul ul,
+        .content ol ol,
+        .content ul ol,
+        .content ol ul {
+            font-size: 10.5pt !important;
+        }
+
+        .content ul li,
+        .content ol li {
+            font-size: 10.5pt !important;
         }
 
         /* Cover Page */
@@ -104,14 +195,15 @@
             position: relative;
             overflow: hidden;
             page-break-after: always;
+            color: white;
         }
 
         .cover-bg {
             position: absolute;
             top: 0;
             left: 0;
-            width: 210mm;
-            height: 297mm;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             z-index: 0;
         }
@@ -122,14 +214,13 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.5));
+            background: linear-gradient(to bottom, rgba(44, 62, 80, 0.3), rgba(44, 62, 80, 0.8));
             z-index: 1;
         }
 
         .cover-content {
             position: relative;
             z-index: 2;
-            width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -171,26 +262,27 @@
         }
 
         .prompt-container {
-            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-            border-left: 6px solid var(--primary-orange);
-            padding: 40px 50px;
-            margin: 20px 0;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            background: #f8f9fa;
+            border-left: 5px solid var(--accent);
+            padding: 40px;
+            margin: 40px 0;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
 
         .prompt-label {
             font-size: 11pt;
             font-weight: bold;
-            color: var(--accent-orange);
+            color: var(--accent);
             text-transform: uppercase;
             margin-bottom: 20px;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
         }
 
         .prompt-text {
             font-size: 20pt;
             font-weight: 300;
-            color: var(--text-dark);
+            color: var(--primary);
             line-height: 1.5;
             font-style: italic;
         }
@@ -199,18 +291,24 @@
         .section {
             margin-bottom: 2em;
             page-break-inside: avoid;
+            font-size: 10.5pt;
         }
 
         .section-exec {
             page-break-after: always;
         }
 
+        .section * {
+            font-size: inherit;
+        }
+
         /* Key Takeaways Styling */
         .takeaways-container {
-            background-color: #fef9f3;
-            border: 1px solid var(--primary-orange);
+            background-color: #fff8f3;
+            border: 1px solid #ffe0b2;
             border-radius: 8px;
-            padding: 25px 30px;
+            padding: 25px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
             margin-top: 15px;
         }
 
@@ -223,80 +321,179 @@
             position: relative;
             padding-left: 25px;
             margin-bottom: 12px;
-            line-height: 1.6;
         }
 
         .takeaways-container li::before {
             content: "✓";
             position: absolute;
             left: 0;
-            color: var(--accent-orange);
+            color: var(--accent);
             font-weight: bold;
         }
 
-        /* Investment Thesis Styling */
-        .thesis-container {
-            background: linear-gradient(to right, var(--primary-orange), #ffd9b3);
-            padding: 30px 35px;
-            border-radius: 8px;
-            margin-top: 15px;
-            color: var(--text-dark);
-        }
-
-        .thesis-container p {
-            font-size: 12pt;
-            line-height: 1.8;
-            margin: 0;
-        }
-
-        /* Scorecard Table */
-        .scorecard-container table {
+        /* Tables */
+        table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
             font-size: 10pt;
         }
 
-        .scorecard-container th {
-            background-color: var(--primary-orange);
+        th {
+            background-color: var(--primary);
             color: white;
-            padding: 12px 15px;
+            padding: 12px;
             text-align: left;
             font-weight: 600;
         }
 
-        .scorecard-container td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-            vertical-align: top;
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--secondary);
         }
 
-        .scorecard-container tr:nth-child(even) {
-            background-color: #fef9f3;
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
         }
 
-        /* Charts */
-        .chart-container {
+        /* Citations & Links */
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer Styling */
+        .page-footer {
+            position: running(footer);
+            font-family: 'Inter', sans-serif;
+            font-size: 7pt;
+            color: #95a5a6;
             text-align: center;
-            margin: 2em 0;
-            page-break-inside: avoid;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            width: 100%;
         }
 
+        /* TOC Styling */
+        .toc-container {
+            page: toc-page;
+            page-break-after: always;
+            padding: 50px 0;
+            background: linear-gradient(to bottom, #fafbfc 0%, #ffffff 100%);
+        }
+
+        .toc-title {
+            font-size: 32pt;
+            color: var(--primary);
+            border-bottom: 4px solid var(--accent);
+            padding-bottom: 18px;
+            margin-bottom: 45px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .toc-title::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background: var(--accent);
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            padding: 30px 40px;
+        }
+
+        .toc-item {
+            margin-bottom: 18px;
+            padding: 10px 0;
+            border-left: 3px solid transparent;
+            padding-left: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            list-style: none;
+        }
+
+        .toc-item::before {
+            content: '▸';
+            position: absolute;
+            left: 5px;
+            top: 10px;
+            color: var(--accent);
+            font-size: 11pt;
+            font-weight: bold;
+            opacity: 0.7;
+            line-height: 1;
+        }
+
+        .toc-item:hover {
+            border-left-color: var(--accent);
+            background: linear-gradient(to right, rgba(230, 126, 34, 0.05), transparent);
+        }
+
+        .toc-item:nth-child(even) {
+            background: linear-gradient(to right, rgba(236, 240, 241, 0.2), transparent);
+        }
+
+        .toc-link {
+            display: flex;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 13.5pt;
+            font-weight: 600;
+            align-items: center;
+            transition: color 0.3s ease;
+            position: relative;
+            line-height: 1.4;
+        }
+
+        .toc-link::after {
+            content: leader('.') ' ' target-counter(attr(href), page);
+            flex-grow: 1;
+            text-align: right;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-left: 20px;
+            transition: color 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .toc-item:hover .toc-link {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .toc-item:hover .toc-link::after {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        /* Chart Images */
         .chart-img {
             max-width: 100%;
             height: auto;
             border: 1px solid #eee;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-top: 20px;
         }
 
-        /* Content Markdown Styling */
+        /* Markdown Content Fixes */
         .content ul {
             list-style-type: disc;
-        }
-
-        .content a {
-            color: var(--accent-orange);
-            text-decoration: underline;
         }
     </style>
 </head>
@@ -320,6 +517,15 @@
         </div>
     </div>
 
+    <!-- Footer Definition -->
+    <div class="page-footer">
+        &copy; {{ date.split(' ')[-1] }}, Tharma, Inc. All Rights Reserved. Tharma is a service mark of Tharma, Inc. All
+        other trademarks mentioned belong to their respective owners. <br>
+        This Generative Search result is AI-generated and may include inaccuracies. Use discretion and verify with
+        original sources. See additional disclaimers located at the back of this report. <br>
+        Page <span style="content: counter(page)"></span>
+    </div>
+
     <!-- Page 2: User Prompt -->
     <div class="prompt-page">
         <div class="prompt-container">
@@ -328,9 +534,30 @@
         </div>
     </div>
 
-    <!-- Page 3: Executive Summary -->
+    <!-- Page 3: Table of Contents -->
+    <div class="toc-container">
+        <div class="toc-title">Table of Contents</div>
+        <ul class="toc-list">
+            <li class="toc-item"><a href="#exec-summary" class="toc-link">Executive Summary</a></li>
+            <li class="toc-item"><a href="#key-takeaways" class="toc-link">Key Takeaways</a></li>
+            <li class="toc-item"><a href="#macro-market-context" class="toc-link">Macro & Market Context</a></li>
+            <li class="toc-item"><a href="#market-overview" class="toc-link">Market Overview</a></li>
+            <li class="toc-item"><a href="#market-assessment" class="toc-link">Market Assessment</a></li>
+            <li class="toc-item"><a href="#data-analysis" class="toc-link">Data Analysis</a></li>
+            <li class="toc-item"><a href="#case-studies" class="toc-link">Case Studies</a></li>
+            <li class="toc-item"><a href="#competitive-landscape" class="toc-link">Competitive Landscape</a></li>
+            <li class="toc-item"><a href="#regulatory-policy" class="toc-link">Regulatory & Policy Environment</a></li>
+            <li class="toc-item"><a href="#pricing-valuation" class="toc-link">Pricing & Valuation Analysis</a></li>
+            <li class="toc-item"><a href="#operational-considerations" class="toc-link">Operational Considerations</a></li>
+            <li class="toc-item"><a href="#risk-assessment" class="toc-link">Risk Assessment</a></li>
+            <li class="toc-item"><a href="#conclusion" class="toc-link">Conclusion</a></li>
+            <li class="toc-item"><a href="#references" class="toc-link">References</a></li>
+        </ul>
+    </div>
+
+    <!-- Page 4: Executive Summary -->
     <div class="section section-exec">
-        <h1>Executive Summary</h1>
+        <h1 id="exec-summary">Executive Summary</h1>
         <div class="content">
             {{ report.executive_summary | markdown | safe }}
         </div>
@@ -338,31 +565,15 @@
 
     <!-- Key Takeaways -->
     <div class="section">
-        <h1>Key Takeaways</h1>
-        <div class="takeaways-container">
+        <h1 id="key-takeaways">Key Takeaways</h1>
+        <div class="content">
             {{ report.key_takeaways | markdown | safe }}
-        </div>
-    </div>
-
-    <!-- Investment Thesis -->
-    <div class="section">
-        <h1>Investment Thesis</h1>
-        <div class="thesis-container">
-            {{ report.investment_thesis | markdown | safe }}
-        </div>
-    </div>
-
-    <!-- Go/No-Go Scorecard -->
-    <div class="section">
-        <h1>Go / No-Go Scorecard</h1>
-        <div class="scorecard-container">
-            {{ report.go_no_go_scorecard | markdown | safe }}
         </div>
     </div>
 
     <!-- Macro & Market Context -->
     <div class="section">
-        <h1>Macro & Market Context</h1>
+        <h1 id="macro-market-context">Macro & Market Context</h1>
         <div class="content">
             {{ report.macro_market_context | markdown | safe }}
         </div>
@@ -370,15 +581,23 @@
 
     <!-- Market Overview -->
     <div class="section">
-        <h1>Market Overview</h1>
+        <h1 id="market-overview">Market Overview</h1>
         <div class="content">
             {{ report.market_overview | markdown | safe }}
         </div>
     </div>
 
+    <!-- Market Assessment -->
+    <div class="section">
+        <h1 id="market-assessment">Market Assessment</h1>
+        <div class="content">
+            {{ report.market_assessment | markdown | safe }}
+        </div>
+    </div>
+
     <!-- Data Analysis -->
     <div class="section">
-        <h1>Data Analysis</h1>
+        <h1 id="data-analysis">Data Analysis</h1>
         <div class="content">
             {{ report.data_analysis | markdown | safe }}
         </div>
@@ -393,9 +612,49 @@
         {% endif %}
     </div>
 
+    <!-- Case Studies -->
+    <div class="section">
+        <h1 id="case-studies">Case Studies / Transaction Log</h1>
+        <div class="content">
+            {{ report.case_studies | markdown | safe }}
+        </div>
+    </div>
+
+    <!-- Competitive Landscape -->
+    <div class="section">
+        <h1 id="competitive-landscape">Competitive Landscape</h1>
+        <div class="content">
+            {{ report.competitive_landscape | markdown | safe }}
+        </div>
+    </div>
+
+    <!-- Regulatory & Policy Environment -->
+    <div class="section">
+        <h1 id="regulatory-policy">Regulatory & Policy Environment</h1>
+        <div class="content">
+            {{ report.regulatory_policy_environment | markdown | safe }}
+        </div>
+    </div>
+
+    <!-- Pricing & Valuation Analysis -->
+    <div class="section">
+        <h1 id="pricing-valuation">Pricing & Valuation Analysis</h1>
+        <div class="content">
+            {{ report.pricing_valuation_analysis | markdown | safe }}
+        </div>
+    </div>
+
+    <!-- Operational Considerations -->
+    <div class="section">
+        <h1 id="operational-considerations">Operational Considerations</h1>
+        <div class="content">
+            {{ report.operational_considerations | markdown | safe }}
+        </div>
+    </div>
+
     <!-- Risk Assessment -->
     <div class="section">
-        <h1>Risk Assessment</h1>
+        <h1 id="risk-assessment">Risk Assessment</h1>
         <div class="content">
             {{ report.risk_assessment | markdown | safe }}
         </div>
@@ -403,11 +662,13 @@
 
     <!-- Conclusion -->
     <div class="section">
-        <h1>Conclusion</h1>
+        <h1 id="conclusion">Conclusion</h1>
         <div class="content">
             {{ report.conclusion | markdown | safe }}
         </div>
     </div>
+
+    <div id="references"></div>
 
 </body>
 

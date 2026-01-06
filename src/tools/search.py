@@ -44,7 +44,7 @@ class MarketSearch:
                 response = self.client.search(
                     query=query,
                     search_depth="advanced",
-                    max_results=5
+                    max_results=15
                 )
                 
                 # Extract URLs from results
