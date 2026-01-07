@@ -7,7 +7,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from src.state import AgentGraphState
 from src.schemas import ResearchPlan
 from src.config import Config
-from src.utils.logger import get_logger
+from src.utils.logger import get_logger, save_agent_io
 
 logger = get_logger(__name__)
 
@@ -79,9 +79,12 @@ def agent_node(state: AgentGraphState) -> dict:
         
         logger.info(f"Research plan generated: {research_plan.target_sector} in {research_plan.geography}")
         
-        return {
+        result = {
             "research_plan": research_plan
         }
+        
+        save_agent_io("Strategist", state, research_plan.model_dump())
+        return result
         
     except Exception as e:
         logger.error(f"Error in Strategist agent: {e}")

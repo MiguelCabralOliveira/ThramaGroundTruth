@@ -9,7 +9,7 @@ from src.tools.search import MarketSearch
 from src.tools.pdf_parser import PDFIngest
 from src.tools.database import VectorDatabase
 from src.config import Config
-from src.utils.logger import get_logger
+from src.utils.logger import get_logger, save_agent_io
 
 logger = get_logger(__name__)
 
@@ -133,10 +133,26 @@ Select sources that are most likely to contain detailed market data and analysis
             else:
                 logger.warning("Failed to store documents in Pinecone")
         
-        return {
+        # Prepare bibliography data
+        bibliography_data = []
+        for i, doc in enumerate(pdf_documents):
+            url = selected_urls[i] if i < len(selected_urls) else "Unknown URL"
+            # Try to get title from first line or use filename/url
+            title = doc.split('\n')[0][:100] if doc else "Untitled Document"
+            bibliography_data.append({
+                "title": title,
+                "url": url,
+                "snippet": doc[:200]
+            })
+
+        result = {
             "pdf_documents": pdf_documents,
-            "pdf_urls": selected_urls[:len(pdf_documents)]
+            "pdf_urls": selected_urls[:len(pdf_documents)],
+            "bibliography_data": bibliography_data
         }
+        
+        save_agent_io("Scout", state, result)
+        return result
         
     except Exception as e:
         logger.error(f"Error in Scout agent: {e}")

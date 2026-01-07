@@ -8,7 +8,7 @@ from src.tools.database import VectorDatabase
 from src.config import Config
 from src.utils.logger import get_logger
 from src.utils.toon_serializer import pydantic_to_toon
-from src.utils.rlm_processor import RLMProcessor
+from src.utils.logger import save_agent_io
 
 logger = get_logger(__name__)
 
@@ -53,15 +53,6 @@ def agent_node(state: AgentGraphState) -> dict:
             api_key=Config.OPENAI_API_KEY
         )
         
-        # Initialize RLM processor for long document handling (optimized for speed)
-        rlm_processor = RLMProcessor(
-            chunk_size=20000,  # Larger chunks = fewer chunks = faster
-            chunk_overlap=500,
-            max_recursion_depth=2,  # Reduced depth for speed
-            model=Config.AGENT_MODELS["researcher"],
-            batch_size=5,  # Process 5 chunks in parallel
-            max_workers=5  # 5 parallel workers
-        )
         
         # Try to use RAG from Pinecone (hybrid approach: RAG + RLM)
         source_documents = []
@@ -160,87 +151,44 @@ def agent_node(state: AgentGraphState) -> dict:
         # Determine processing strategy
         research_plan_str = pydantic_to_toon(research_plan) if research_plan else "N/A"
         
-        if source_documents:
-            # RAG found results - use RLM to process them if needed
-            total_rag_length = sum(
-                len(doc.get("metadata", {}).get("text", doc.get("text", "")))
-                for doc in source_documents
-            )
-            
-            # Use RLM if RAG results are extensive or if we also have full documents
-            if total_rag_length > 50000 or pdf_documents:
-                logger.info("Using RLM to process RAG results with full document context")
-                use_rlm = True
-                
-                # Build query from research plan
-                query = f"{research_plan.target_sector} in {research_plan.geography}: market overview, trends, yields, risks, transactions"
-                
-                qualitative_research = rlm_processor.extract_with_rag_fallback(
-                    documents=pdf_documents,
-                    query=query,
-                    rag_results=source_documents
-                )
-            else:
-                # Small RAG results, use traditional approach
-                logger.info("RAG results are manageable, using traditional processing")
-                context_parts = []
-                for i, doc in enumerate(source_documents):
-                    source_info = doc.get("metadata", {}).get("source", "Unknown Source")
-                    text = doc.get("metadata", {}).get("text", doc.get("text", ""))
-                    context_parts.append(f"[Source {i+1}: {source_info}]\n{text}")
-                
-                context_text = "\n\n---\n\n".join(context_parts)
-                
-                prompt = ChatPromptTemplate.from_messages([
-                    ("system", prompt_template),
-                    ("human", """Research Plan:
+        # Use RAG results for synthesis
+        logger.info(f"Synthesizing qualitative research from {len(source_documents)} RAG chunks")
+        
+        context_parts = []
+        for i, doc in enumerate(source_documents):
+            source_info = doc.get("metadata", {}).get("source", "Unknown Source")
+            text = doc.get("metadata", {}).get("text", doc.get("text", ""))
+            context_parts.append(f"[Source {i+1}: {source_info}]\n{text}")
+        
+        context_text = "\n\n---\n\n".join(context_parts)
+        
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", prompt_template),
+            ("human", """Research Plan:
 {research_plan}
 
 Documents and Sources:
 {pdf_documents}
 
 Please synthesize the qualitative research. IMPORTANT: For every key claim or statistic, include a citation in the format [Source: Source Name] based on the source information provided above.""")
-                ])
-                
-                chain = prompt | llm
-                response = chain.invoke({
-                    "research_plan": research_plan_str,
-                    "pdf_documents": context_text
-                })
-                qualitative_research = response.content
-        else:
-            # No RAG results - use RLM on full documents
-            logger.info("No RAG results, using RLM to process full PDF documents")
-            use_rlm = True
-            
-            query = f"{research_plan.target_sector} in {research_plan.geography}: comprehensive market analysis" if research_plan else "comprehensive market analysis"
-            
-            processing_instruction = f"""Synthesize qualitative research based on the research plan:
-
-Research Plan:
-{research_plan_str}
-
-Extract and synthesize:
-- Market trends and dynamics
-- Key statistics and metrics
-- Investment opportunities and risks
-- Regulatory environment
-- Recent transactions and case studies
-
-For every key claim or statistic, include a citation in the format [Source: Source Name]."""
-            
-            qualitative_research = rlm_processor.process_documents(
-                documents=pdf_documents,
-                processing_instruction=processing_instruction,
-                system_prompt=prompt_template
-            )
+        ])
+        
+        chain = prompt | llm
+        response = chain.invoke({
+            "research_plan": research_plan_str,
+            "pdf_documents": context_text
+        })
+        qualitative_research = response.content
         
         logger.info(f"Qualitative research generated: {len(qualitative_research)} characters")
         
-        return {
+        result = {
             "qualitative_research": qualitative_research,
             "source_documents": source_documents
         }
+        
+        save_agent_io("Researcher", state, result)
+        return result
         
     except Exception as e:
         logger.error(f"Error in Researcher agent: {e}")

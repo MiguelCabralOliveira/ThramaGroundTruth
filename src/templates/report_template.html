@@ -378,108 +378,71 @@
             width: 100%;
         }
 
-        /* TOC Styling */
+        /* Simplified, Minimalist TOC */
         .toc-container {
             page: toc-page;
             page-break-after: always;
-            padding: 50px 0;
-            background: linear-gradient(to bottom, #fafbfc 0%, #ffffff 100%);
+            padding: 40px 0;
         }
 
         .toc-title {
-            font-size: 32pt;
+            font-size: 24pt;
             color: var(--primary);
-            border-bottom: 4px solid var(--accent);
-            padding-bottom: 18px;
-            margin-bottom: 45px;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             font-weight: 700;
-            position: relative;
-        }
-
-        .toc-title::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 80px;
-            height: 4px;
-            background: var(--accent);
         }
 
         .toc-list {
             list-style: none;
             padding: 0;
             margin: 0;
-            background: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-            padding: 30px 40px;
         }
 
         .toc-item {
-            margin-bottom: 18px;
-            padding: 10px 0;
-            border-left: 3px solid transparent;
-            padding-left: 25px;
-            transition: all 0.3s ease;
-            position: relative;
-            list-style: none;
-        }
-
-        .toc-item::before {
-            content: '▸';
-            position: absolute;
-            left: 5px;
-            top: 10px;
-            color: var(--accent);
-            font-size: 11pt;
-            font-weight: bold;
-            opacity: 0.7;
-            line-height: 1;
-        }
-
-        .toc-item:hover {
-            border-left-color: var(--accent);
-            background: linear-gradient(to right, rgba(230, 126, 34, 0.05), transparent);
-        }
-
-        .toc-item:nth-child(even) {
-            background: linear-gradient(to right, rgba(236, 240, 241, 0.2), transparent);
+            margin-bottom: 8px;
+            padding: 2px 0;
         }
 
         .toc-link {
-            display: flex;
-            color: var(--text-main);
             text-decoration: none;
-            font-size: 13.5pt;
-            font-weight: 600;
-            align-items: center;
-            transition: color 0.3s ease;
-            position: relative;
-            line-height: 1.4;
-        }
-
-        .toc-link::after {
-            content: leader('.') ' ' target-counter(attr(href), page);
-            flex-grow: 1;
-            text-align: right;
-            color: var(--text-muted);
+            color: var(--text-main);
+            font-size: 11pt;
             font-weight: 400;
-            margin-left: 20px;
-            transition: color 0.3s ease;
-            white-space: nowrap;
+            display: block;
+            width: 100%;
         }
 
-        .toc-item:hover .toc-link {
+        .toc-link::before {
+            content: "▸";
             color: var(--accent);
-            font-weight: 700;
+            margin-right: 12px;
+            font-size: 10pt;
         }
 
-        .toc-item:hover .toc-link::after {
+        /* Dot Leader implementation for WeasyPrint */
+        .toc-link::after {
+            content: leader('.') target-counter(attr(href), page);
+            float: right;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        .toc-link:hover {
             color: var(--accent);
-            font-weight: 500;
+        }
+
+        .toc-page-num {
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 12pt;
+        }
+
+        .toc-link:hover {
+            color: var(--accent);
         }
 
         /* Chart Images */
@@ -538,71 +501,47 @@
     <div class="toc-container">
         <div class="toc-title">Table of Contents</div>
         <ul class="toc-list">
-            <li class="toc-item"><a href="#exec-summary" class="toc-link">Executive Summary</a></li>
-            <li class="toc-item"><a href="#key-takeaways" class="toc-link">Key Takeaways</a></li>
-            <li class="toc-item"><a href="#macro-market-context" class="toc-link">Macro & Market Context</a></li>
-            <li class="toc-item"><a href="#market-overview" class="toc-link">Market Overview</a></li>
-            <li class="toc-item"><a href="#market-assessment" class="toc-link">Market Assessment</a></li>
-            <li class="toc-item"><a href="#data-analysis" class="toc-link">Data Analysis</a></li>
-            <li class="toc-item"><a href="#case-studies" class="toc-link">Case Studies</a></li>
-            <li class="toc-item"><a href="#competitive-landscape" class="toc-link">Competitive Landscape</a></li>
-            <li class="toc-item"><a href="#regulatory-policy" class="toc-link">Regulatory & Policy Environment</a></li>
-            <li class="toc-item"><a href="#pricing-valuation" class="toc-link">Pricing & Valuation Analysis</a></li>
-            <li class="toc-item"><a href="#operational-considerations" class="toc-link">Operational Considerations</a></li>
-            <li class="toc-item"><a href="#risk-assessment" class="toc-link">Risk Assessment</a></li>
-            <li class="toc-item"><a href="#conclusion" class="toc-link">Conclusion</a></li>
-            <li class="toc-item"><a href="#references" class="toc-link">References</a></li>
+            <!-- Main Sections -->
+            {% for section in main_sections %}
+            <li class="toc-item">
+                <a href="#{{ section.id }}" class="toc-link">
+                    {{ section.title }}
+                </a>
+            </li>
+            {% endfor %}
+
+            {% if annex_sections %}
+            <!-- Annexes Group -->
+            <li class="toc-item" style="margin-top: 25px; margin-bottom: 10px;">
+                <span
+                    style="font-size: 14pt; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 1px;">
+                    Annexes (Additional Information)
+                </span>
+            </li>
+            {% for section in annex_sections %}
+            <li class="toc-item" style="padding-left: 20px;">
+                <a href="#{{ section.id }}" class="toc-link">
+                    {{ section.title }}
+                </a>
+            </li>
+            {% endfor %}
+            {% endif %}
+
+            <li class="toc-item">
+                <a href="#references" class="toc-link">References</a>
+            </li>
         </ul>
     </div>
 
-    <!-- Page 4: Executive Summary -->
-    <div class="section section-exec">
-        <h1 id="exec-summary">Executive Summary</h1>
+    <!-- Main Sections -->
+    {% for section in main_sections %}
+    <div class="section {% if section.id == 'executive_summary' %}section-exec{% endif %}">
+        <h1 id="{{ section.id }}">{{ section.title }}</h1>
         <div class="content">
-            {{ report.executive_summary | markdown | safe }}
-        </div>
-    </div>
-
-    <!-- Key Takeaways -->
-    <div class="section">
-        <h1 id="key-takeaways">Key Takeaways</h1>
-        <div class="content">
-            {{ report.key_takeaways | markdown | safe }}
-        </div>
-    </div>
-
-    <!-- Macro & Market Context -->
-    <div class="section">
-        <h1 id="macro-market-context">Macro & Market Context</h1>
-        <div class="content">
-            {{ report.macro_market_context | markdown | safe }}
-        </div>
-    </div>
-
-    <!-- Market Overview -->
-    <div class="section">
-        <h1 id="market-overview">Market Overview</h1>
-        <div class="content">
-            {{ report.market_overview | markdown | safe }}
-        </div>
-    </div>
-
-    <!-- Market Assessment -->
-    <div class="section">
-        <h1 id="market-assessment">Market Assessment</h1>
-        <div class="content">
-            {{ report.market_assessment | markdown | safe }}
-        </div>
-    </div>
-
-    <!-- Data Analysis -->
-    <div class="section">
-        <h1 id="data-analysis">Data Analysis</h1>
-        <div class="content">
-            {{ report.data_analysis | markdown | safe }}
+            {{ report[section.id] | markdown | safe }}
         </div>
 
-        {% if charts %}
+        {% if section.id == 'data_analysis' and charts %}
         <div class="chart-container">
             <h3>Key Metrics Visualization</h3>
             {% for chart in charts %}
@@ -611,64 +550,37 @@
         </div>
         {% endif %}
     </div>
+    {% endfor %}
 
-    <!-- Case Studies -->
-    <div class="section">
-        <h1 id="case-studies">Case Studies / Transaction Log</h1>
-        <div class="content">
-            {{ report.case_studies | markdown | safe }}
+    {% if annex_sections %}
+    <!-- Annexes Separator Page -->
+    <div class="section"
+        style="page-break-before: always; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 800px; text-align: center;">
+        <div
+            style="border-top: 4px solid var(--accent); border-bottom: 4px solid var(--accent); padding: 40px 0; width: 80%;">
+            <h1
+                style="font-size: 42pt; text-transform: uppercase; letter-spacing: 8px; margin: 0; color: var(--primary);">
+                Annexes</h1>
+            <p
+                style="font-size: 16pt; color: var(--text-muted); margin-top: 20px; font-weight: 300; letter-spacing: 2px;">
+                ADDITIONAL INFORMATION & DOCUMENTATION</p>
         </div>
     </div>
 
-    <!-- Competitive Landscape -->
+    <!-- Annex Sections -->
+    {% for section in annex_sections %}
     <div class="section">
-        <h1 id="competitive-landscape">Competitive Landscape</h1>
+        <h1 id="{{ section.id }}">{{ section.title }}</h1>
         <div class="content">
-            {{ report.competitive_landscape | markdown | safe }}
+            {{ report[section.id] | markdown | safe }}
         </div>
     </div>
-
-    <!-- Regulatory & Policy Environment -->
-    <div class="section">
-        <h1 id="regulatory-policy">Regulatory & Policy Environment</h1>
-        <div class="content">
-            {{ report.regulatory_policy_environment | markdown | safe }}
-        </div>
-    </div>
-
-    <!-- Pricing & Valuation Analysis -->
-    <div class="section">
-        <h1 id="pricing-valuation">Pricing & Valuation Analysis</h1>
-        <div class="content">
-            {{ report.pricing_valuation_analysis | markdown | safe }}
-        </div>
-    </div>
-
-    <!-- Operational Considerations -->
-    <div class="section">
-        <h1 id="operational-considerations">Operational Considerations</h1>
-        <div class="content">
-            {{ report.operational_considerations | markdown | safe }}
-        </div>
-    </div>
-
-    <!-- Risk Assessment -->
-    <div class="section">
-        <h1 id="risk-assessment">Risk Assessment</h1>
-        <div class="content">
-            {{ report.risk_assessment | markdown | safe }}
-        </div>
-    </div>
-
-    <!-- Conclusion -->
-    <div class="section">
-        <h1 id="conclusion">Conclusion</h1>
-        <div class="content">
-            {{ report.conclusion | markdown | safe }}
-        </div>
-    </div>
+    {% endfor %}
+    {% endif %}
 
     <div id="references"></div>
+
+</body>
 
 </body>
 

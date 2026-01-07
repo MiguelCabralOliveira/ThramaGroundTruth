@@ -12,6 +12,7 @@ class AgentGraphState(TypedDict):
     research_plan: Optional[ResearchPlan]
     pdf_documents: List[str]  # Parsed text content from PDFs
     pdf_urls: List[str]  # Original URLs of the PDFs
+    bibliography_data: List[dict]  # Metadata for all found sources: {title, url, snippet}
     source_documents: List[dict]  # RAG chunks with metadata: {text, source_url, source_title}
     analyst_output: Optional[AnalystOutput]
     qualitative_research: str

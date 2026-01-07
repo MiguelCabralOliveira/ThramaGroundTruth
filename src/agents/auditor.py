@@ -6,7 +6,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from src.state import AgentGraphState
 from src.schemas import ReviewCritique
 from src.config import Config
-from src.utils.logger import get_logger
+from src.utils.logger import get_logger, save_agent_io
 from src.utils.toon_serializer import pydantic_to_toon
 
 logger = get_logger(__name__)
@@ -118,9 +118,12 @@ Please review the report and provide your critique as specified in your instruct
             logger.info(f"Feedback: {review_feedback.feedback[:200]}...")
             logger.info(f"Missing data: {review_feedback.missing_data}")
         
-        return {
+        result = {
             "review_feedback": review_feedback
         }
+        
+        save_agent_io("Auditor", state, review_feedback.model_dump())
+        return result
         
     except Exception as e:
         logger.error(f"Error in Auditor agent: {e}")

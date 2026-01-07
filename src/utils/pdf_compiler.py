@@ -34,18 +34,15 @@ class PDFCompiler:
         
         logger.info("PDF compiler initialized with WeasyPrint support")
     
-    def compile_report_to_pdf(self, report_data: Dict[str, Any], charts: List[str], user_request: str, output_filename: str) -> Optional[str]:
+    def compile_report_to_pdf(self, 
+                               report_data: Dict[str, Any], 
+                               charts: List[str], 
+                               user_request: str, 
+                               output_filename: str, 
+                               main_sections: Optional[List[Dict[str, str]]] = None,
+                               annex_sections: Optional[List[Dict[str, str]]] = None) -> Optional[str]:
         """
         Compile report data to PDF using HTML template.
-        
-        Args:
-            report_data: Dictionary containing report sections
-            charts: List of paths to chart images
-            user_request: The original user request/prompt
-            output_filename: Desired output filename (without extension)
-            
-        Returns:
-            Path to generated PDF file
         """
         try:
             # Load template
@@ -57,7 +54,9 @@ class PDFCompiler:
                 report=report_data,
                 charts=charts,
                 user_request=user_request,
-                date=datetime.now().strftime("%B %d, %Y")
+                date=datetime.now().strftime("%B %d, %Y"),
+                main_sections=main_sections or [],
+                annex_sections=annex_sections or []
             )
             
             # Save HTML for debugging

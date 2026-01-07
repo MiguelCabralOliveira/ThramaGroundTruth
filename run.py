@@ -18,42 +18,33 @@ def format_report_draft(report_draft) -> str:
         return "# Report Draft\n\nNo report draft available."
     
     markdown = f"""# {report_draft.executive_summary.split('\\n')[0] if report_draft.executive_summary else 'Market Intelligence Report'}
-
+    
 ## Executive Summary
-
-{report_draft.executive_summary}
+{report_draft.executive_summary or 'N/A'}
 
 ## Key Takeaways
-
-{report_draft.key_takeaways}
+{report_draft.key_takeaways or 'N/A'}
 
 ## Market Assessment
-
-{report_draft.market_assessment}
+{report_draft.market_assessment or 'N/A'}
 
 ## Case Studies
-
-{report_draft.case_studies}
+{report_draft.case_studies or 'N/A'}
 
 ## Macro & Market Context
-
-{report_draft.macro_market_context}
+{report_draft.macro_market_context or 'N/A'}
 
 ## Market Overview
-
-{report_draft.market_overview}
+{report_draft.market_overview or 'N/A'}
 
 ## Data Analysis
-
-{report_draft.data_analysis}
+{report_draft.data_analysis or 'N/A'}
 
 ## Risk Assessment
-
-{report_draft.risk_assessment}
+{report_draft.risk_assessment or 'N/A'}
 
 ## Conclusion
-
-{report_draft.conclusion}
+{report_draft.conclusion or 'N/A'}
 """
     return markdown
 
@@ -63,7 +54,7 @@ def main():
     # Suppress LangSmith multipart warnings globally
     import logging
     langsmith_logger = logging.getLogger("langsmith")
-    langsmith_logger.setLevel(logging.ERROR)  # Only show errors, suppress warnings
+    langsmith_logger.setLevel(logging.ERROR)  
     
     logger.info("=" * 60)
     logger.info("GroundTruth Real Estate Market Intelligence Agent")
@@ -104,15 +95,14 @@ def main():
             logger.warning("LANGCHAIN_TRACING_V2 is true but LANGCHAIN_API_KEY is missing")
             logger.warning("Get your API key from: https://smith.langchain.com/settings")
     
-    # Create graph
+    
     logger.info("Initializing agent graph...")
     from langgraph.checkpoint.memory import MemorySaver
-    checkpointer = MemorySaver()  # Required for LangGraph Studio
+    checkpointer = MemorySaver() 
     graph = create_graph(checkpointer=checkpointer)
     
-    # User request (hardcoded example as specified)
-    user_request = "Investment analysis of the UK Multi-Let Industrial (MLI) sector focusing on acquisition strategies and rental yield potential"
-    
+    # User request
+    user_request = "Investment analysis of the Pennsylvania, USA multi-let light industrial facilities sector"
     logger.info(f"Processing request: {user_request}")
     logger.info("-" * 60)
     
@@ -134,11 +124,10 @@ def main():
     try:
         logger.info("Starting agent workflow...")
         
-        # Config for checkpointer (required when using MemorySaver)
-        # Also set recursion limit to prevent infinite loops
+        
         config = {
             "configurable": {"thread_id": "1"},
-            "recursion_limit": 50  # Maximum number of graph steps
+            "recursion_limit": 10 
         }
         
         # Stream events
@@ -180,11 +169,32 @@ def main():
             analyst_output = final_state.get("analyst_output")
             charts = analyst_output.charts_generated if analyst_output else []
             
+            # Prepare section groups based on boolean toggles
+            main_sections = []
+            annex_sections = []
+            
+            for section_id, is_main in Config.REPORT_SECTIONS.items():
+                if not report_data.get(section_id):
+                    continue
+                    
+                section_info = {"id": section_id, "title": Config.SECTION_METADATA.get(section_id, section_id)}
+                if is_main:
+                    main_sections.append(section_info)
+                else:
+                    annex_sections.append(section_info)
+            
+            # Add bibliography to conclusion if it exists
+            if "conclusion" in report_data and report_data["conclusion"]:
+                if not any(s["id"] == "conclusion" for s in main_sections + annex_sections):
+                    main_sections.append({"id": "conclusion", "title": Config.SECTION_METADATA.get("conclusion", "Conclusion")})
+            
             report_path = pdf_compiler.compile_report_to_pdf(
                 report_data,
                 charts,
                 user_request,
-                "final_report"
+                "final_report",
+                main_sections=main_sections,
+                annex_sections=annex_sections
             )
             
             if report_path:

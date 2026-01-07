@@ -17,7 +17,7 @@ class Config:
     # gpt-5.2-2025-12-11
     OPENAI_MODEL_PRO: str = os.getenv("OPENAI_MODEL_PRO", "gpt-5-mini-2025-08-07")
     
-    # Per-agent model configuration
+   
     AGENT_MODELS = {
         "prompt_enhancer": OPENAI_MODEL,
         "strategist": OPENAI_MODEL,
@@ -27,6 +27,40 @@ class Config:
         "writer": OPENAI_MODEL_PRO,
         "auditor": OPENAI_MODEL,
     }
+
+    REPORT_SECTIONS = {
+        "executive_summary": True,
+        "key_takeaways": True,
+        "macro_market_context": True,
+        "market_overview": True,
+        "market_assessment": True,
+        "data_analysis": True,
+        "case_studies": True,
+        "competitive_landscape": False,
+        "regulatory_policy_environment": False,
+        "pricing_valuation_analysis": True,
+        "operational_considerations": False,
+        "risk_assessment": True,
+        "conclusion": True
+    }
+
+
+    SECTION_METADATA = {
+        "executive_summary": "Executive Summary",
+        "key_takeaways": "Key Takeaways",
+        "macro_market_context": "Macro & Market Context",
+        "market_overview": "Market Overview",
+        "market_assessment": "Market Assessment",
+        "data_analysis": "Data Analysis",
+        "case_studies": "Case Studies",
+        "competitive_landscape": "Competitive Landscape",
+        "regulatory_policy_environment": "Regulatory & Policy Environment",
+        "pricing_valuation_analysis": "Pricing & Valuation Analysis",
+        "operational_considerations": "Operational Considerations",
+        "risk_assessment": "Risk Assessment",
+        "conclusion": "Conclusion"
+    }
+
     
     # Anthropic
     ANTHROPIC_API_KEY: Optional[str] = os.getenv("ANTHROPIC_API_KEY")
